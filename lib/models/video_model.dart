@@ -3,12 +3,14 @@ class Video{
   final String title;
   final String thumbnailUrl;
   final String channelTitle;
+  final String description;
 
   Video({
     required this.id,
     required this.title,
     required this.thumbnailUrl,
     required this.channelTitle,
+    required this.description,
   });
 
   factory Video.fromMap(Map<String, dynamic> map) {
@@ -16,7 +18,8 @@ class Video{
       id: map['id'] ?? '',
       title: map['snippet']['title'],
       thumbnailUrl: map['snippet']['thumbnails']['high']['url'],
-      channelTitle: map['snippet']['channelTitle'] ?? map['snippet']['customUrl'] ?? '',
+      channelTitle: map['snippet']['channelTitle'],
+      description: map['snippet']['description'],
     );
   }
 }
