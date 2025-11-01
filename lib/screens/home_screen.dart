@@ -17,6 +17,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final _controller = TextEditingController();
   Future<String>? _descriptionFuture;
 
+  Future<Video>? _videoFuture;
+
   // 動画用コントローラー
   YoutubePlayerController? _playerController;
 
@@ -31,6 +33,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<String> extractDescriptionFromUrl(String url) async {
     final videoId = extractVideoId(url);
     return await APIService.instance.fetchVideoDescription(videoId);
+  }
+
+  /// URLから動画を抽出する
+  Future<Video> extractVideoFromUrl(String url) async {
+    final videoId = extractVideoId(url);
+    return await APIService.instance.fetchVideoFromId(videoId);
   }
 
   /// 動画を読み込む
@@ -73,14 +81,55 @@ class _HomeScreenState extends State<HomeScreen> {
                     setState(() {
                       _loadVideo();
                       _descriptionFuture = extractDescriptionFromUrl(_controller.text);
+                      _videoFuture = extractVideoFromUrl(_controller.text);
                     });
                   }
                 ),
               ),
             ), 
             const SizedBox(height: 12),
-            // 動画
-            VideoScreen(id: _controller.text),
+            SizedBox(
+              child: FutureBuilder<Video>(
+                future: _videoFuture, 
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Text('エラー: ${snapshot.error}');
+                  } else if (!snapshot.hasData || snapshot.data == null) {
+                    return const Text('動画が見つかりませんでした');
+                  }
+
+                  final video = snapshot.data!;
+                  return _buildVideoInfo(video);
+                  //   child: Column(
+                  //     crossAxisAlignment: CrossAxisAlignment.start,
+                  //     children: [
+                  //       Image.network(video.thumbnailUrl),
+                  //       const SizedBox(height: 12),
+                  //       Text(
+                  //         video.title,
+                  //         style: const TextStyle(
+                  //           fontSize: 20,
+                  //           fontWeight: FontWeight.bold,
+                  //         ),
+                  //       ),
+                  //       const SizedBox(height: 8),
+                  //       Text(
+                  //         'チャンネル名：${video.channelTitle}',
+                  //         style: const TextStyle(fontSize: 16),
+                  //       ),
+                  //       const SizedBox(height: 16),
+                  //       Text(
+                  //         video.description,
+                  //         style: const TextStyle(fontSize: 14),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // );
+                },
+              ),
+            ), 
             const SizedBox(height: 12),
             // 概要欄
             Expanded(
@@ -118,11 +167,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  _buildVideo(Video video) {
+  /// 動画の情報
+  _buildVideoInfo(Video video) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
-      padding: const EdgeInsets.all(10.0),
-      height: 140.0,
+      margin: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
+      padding: const EdgeInsets.all(5.0),
+      height: 150.0,
       decoration: BoxDecoration(
         color: const Color(0xFFBADFDB),
         boxShadow: [
@@ -133,23 +183,28 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      child: Row(
+      child: Column(
         children: <Widget>[
-          Image(
-            width: 150.0,
-            image: NetworkImage(video.thumbnailUrl),
-          ),
-          SizedBox(width: 10.0),
-          Expanded(
-            child: Text(
-              video.title,
-              style: const TextStyle(
-                color: Colors.black12,
-                fontSize: 18.0,
+          Text(video.channelTitle),
+          SizedBox(height: 5.0),
+          Row(
+            children: [
+              Image(
+                width: 150.0,
+                image: NetworkImage(video.thumbnailUrl),
               ),
-              overflow: TextOverflow.ellipsis,
-            )
-          ),
+              SizedBox(width: 5.0),
+              Expanded(
+                child: Text(
+                  video.title,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 12.0,
+                  ),
+                )
+              ),
+            ],
+          )          
         ],
       ),
     );

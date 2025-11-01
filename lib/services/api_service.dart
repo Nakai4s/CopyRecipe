@@ -33,9 +33,10 @@ class APIService {
 
     if(response.statusCode == 200) {
       final data = json.decode(response.body);
-      return Video.fromMap(data);
+      final item = data['items'][0];
+      return Video.fromMap(item);
     } else {
-      throw Exception('Failed to load video description');
+      throw Exception('動画情報の取得に失敗しました');
     }
   }
 
