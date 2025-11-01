@@ -59,11 +59,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFCF9EA),
+      backgroundColor: const Color(0xFFC1CFA1),
       appBar: AppBar(
         centerTitle: true,        
         title: Text('CopyRecipe'),
-        backgroundColor: const Color(0xFFFFBDBD),
+        backgroundColor: const Color(0xFFB17F59),
       ),
       body: Padding(        
         padding: const EdgeInsets.all(25.0),
