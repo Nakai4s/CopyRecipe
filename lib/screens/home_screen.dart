@@ -1,7 +1,7 @@
-import 'package:copy_recipe/models/video_model.dart';
 import 'package:flutter/material.dart';
+import 'package:copy_recipe/models/video_model.dart';
 import 'package:copy_recipe/services/api_service.dart';
-import 'package:copy_recipe/screens/video_screen.dart';
+import 'package:copy_recipe/models/recipe_model.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 
@@ -59,11 +59,16 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFC1CFA1),
-      appBar: AppBar(
-        centerTitle: true,        
-        title: Text('CopyRecipe'),
-        backgroundColor: const Color(0xFFB17F59),
+      backgroundColor: const Color(0xFFEBE5C2),
+      appBar: AppBar(      
+        title: Text(
+          'CopyRecipe',
+          style: TextStyle(
+            color: const Color(0xFFF8F3D9),
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: const Color(0xFF504B38),
       ),
       body: Padding(        
         padding: const EdgeInsets.all(25.0),
@@ -102,31 +107,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   final video = snapshot.data!;
                   return _buildVideoInfo(video);
-                  //   child: Column(
-                  //     crossAxisAlignment: CrossAxisAlignment.start,
-                  //     children: [
-                  //       Image.network(video.thumbnailUrl),
-                  //       const SizedBox(height: 12),
-                  //       Text(
-                  //         video.title,
-                  //         style: const TextStyle(
-                  //           fontSize: 20,
-                  //           fontWeight: FontWeight.bold,
-                  //         ),
-                  //       ),
-                  //       const SizedBox(height: 8),
-                  //       Text(
-                  //         'チャンネル名：${video.channelTitle}',
-                  //         style: const TextStyle(fontSize: 16),
-                  //       ),
-                  //       const SizedBox(height: 16),
-                  //       Text(
-                  //         video.description,
-                  //         style: const TextStyle(fontSize: 14),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // );
                 },
               ),
             ), 
@@ -147,8 +127,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                   // データ取得
                   else if (snapshot.hasData) {
+                    String? afterRegExp = RecipeParts.extractRecipe(snapshot.data!).steps;
+                    if(afterRegExp == '') afterRegExp = 'レシピを取得できませんでした。';
                     return SingleChildScrollView(
-                      child: SelectableText(snapshot.data ?? ''),
+                      child: SelectableText(
+                          afterRegExp,
+                      ),
                     );
                   } else {
                     return const Text('ここに概要欄が表示されます');
@@ -174,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.all(5.0),
       height: 150.0,
       decoration: BoxDecoration(
-        color: const Color(0xFFBADFDB),
+        color: const Color(0xFFF8F3D9),
         boxShadow: [
           BoxShadow(
             color: Colors.black12,
@@ -185,15 +169,19 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       child: Column(
         children: <Widget>[
+          // チャンネルのタイトル
           Text(video.channelTitle),
-          SizedBox(height: 5.0),
+          const SizedBox(height: 5.0),
           Row(
             children: [
+              // サムネイル画像
               Image(
                 width: 150.0,
                 image: NetworkImage(video.thumbnailUrl),
               ),
-              SizedBox(width: 5.0),
+              const SizedBox(width: 5.0),
+              // 動画タイトル
+              
               Expanded(
                 child: Text(
                   video.title,
