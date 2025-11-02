@@ -18,19 +18,21 @@ class RecipeParts {
       }
     }
 
+    // 関係ない動画の概要欄も拾うから一旦辞める
     if (start == -1) {
-      // 見出しが見つからない場合は、キーワード＆材料っぽい行のまとまりを探す
-      final candidates = <String>[];
-      for (var line in lines) {
-        if (_ingredientLine.hasMatch(line) || _stepLine.hasMatch(line)) {
-          candidates.add(line);
-        }
-      }
+      // // 見出しが見つからない場合は、キーワード＆材料っぽい行のまとまりを探す
+      // final candidates = <String>[];
+      // for (var line in lines) {
+      //   if (_ingredientLine.hasMatch(line) || _stepLine.hasMatch(line)) {
+      //     candidates.add(line);
+      //   }
+      // }
       
-      return RecipeParts(
-        ingredients: '',
-        steps: candidates.join('\n'),
-      );
+      // return RecipeParts(
+      //   ingredients: '',
+      //   steps: candidates.join('\n'),
+      // );
+      return RecipeParts(ingredients: '', steps: '',);
     }
 
     // from start, gather until a footer-like section (SNS / Links / 提供 / 協賛) or long URL block
@@ -57,16 +59,16 @@ class RecipeParts {
 }
 
 final _sectionStartPattern = RegExp(
-  r'今回のレシピはこちら|【チャプター】|材料'
+  r'今回のレシピはこちら|材料'
 );
 
-final _ingredientLine = RegExp(
-  r'^(?:[-・\u2022\*\dⅠⅡⅢ④⑤⑥⑦⑧⑨⑩\(\)\.]\s*)?.{2,50}(\d+(\.\d+)?\s?(g|kg|ml|cc|個|本|枚|tbsp|tsp|大さじ|小さじ|cup|cups))'
-);
+// final _ingredientLine = RegExp(
+//   r'^(?:[-・\u2022\*\dⅠⅡⅢ④⑤⑥⑦⑧⑨⑩\(\)\.]\s*)?.{2,50}(\d+(\.\d+)?\s?(g|kg|ml|cc|個|本|枚|tbsp|tsp|大さじ|小さじ|cup|cups))'
+// );
 
-final _stepLine = RegExp(
-  r'^(?:\d+\.|①|②|1\)|\d+\)|\d+：)?\s*.*(する|炒める|煮る|混ぜる|切る|焼く|加える|戻す|冷ます|盛り付け)'
-);
+// final _stepLine = RegExp(
+//   r'^(?:\d+\.|①|②|1\)|\d+\)|\d+：)?\s*.*(する|炒める|煮る|混ぜる|切る|焼く|加える|戻す|冷ます|盛り付け)'
+// );
 
 final _footerPattern = RegExp(
   r'(?:SNS|Instagram|Twitter|LINE|提供|協賛|スポンサー|https?:\/\/|bit\.ly|@)'
