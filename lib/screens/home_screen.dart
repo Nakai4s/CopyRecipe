@@ -27,7 +27,17 @@ class HomeScreen extends ConsumerWidget {
           }
           else {
             final Video video = videoLists[index];
-            return RecipeTile(video: video);
+            return RecipeTile(
+              video: video,
+              onTap: () {
+                Navigator.push(
+                  context, 
+                  MaterialPageRoute(
+                    builder: (_) => RecipeScreen(video: video),
+                  ),
+                );
+              },
+            );
           }
         },
       ),
