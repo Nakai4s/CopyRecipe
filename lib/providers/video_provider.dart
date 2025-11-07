@@ -45,7 +45,6 @@ class VideoNotifier extends Notifier<List<Video>> {
 
   /// URLから動画を抽出する
   Future<Video> extractVideoFromUrl(String url) async {
-    final id = _uuid.v4();
     final videoId = extractVideoId(url);
     Video v = await APIService.instance.fetchVideoFromId(videoId);
     await _box.put(v.id, v);

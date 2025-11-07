@@ -15,15 +15,15 @@ class RecipeTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.all(12.0),
-      color: Colors.red,
+      margin: EdgeInsets.all(5.0),
+      color: Color(0xFFFFE8CD),
       child: ListTile(
         title: Text(video.channelTitle, textAlign: TextAlign.left),
         subtitle: Row(
           children: [
             // サムネイル画像
             Image(
-              width: 150.0,
+              width: 120.0,
               image: NetworkImage(video.thumbnailUrl),
             ),
             const SizedBox(width: 5.0),
