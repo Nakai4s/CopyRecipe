@@ -53,6 +53,8 @@ class VideoNotifier extends Notifier<List<Video>> {
     return v;
   }
 
+  
+
   // ウィッシュリストを追加
   // Future<void> addVideo(String url) async {
   //   final id = _uuid.v4();

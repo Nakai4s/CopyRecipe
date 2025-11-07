@@ -1,12 +1,12 @@
-import 'package:copy_recipe/widgets/recipe_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:copy_recipe/models/video_model.dart';
 import 'package:copy_recipe/services/api_service.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-
 class RecipeScreen extends StatefulWidget {
-  const RecipeScreen({super.key});
+  final Video video;
+  
+  const RecipeScreen({super.key, required this.video});
   @override
   _RecipeScreen createState() => _RecipeScreen();
 }
@@ -67,22 +67,6 @@ class _RecipeScreen extends State<RecipeScreen> {
         padding: const EdgeInsets.all(25.0),
         child: Column(          
           children: [
-            const SizedBox(height: 12),
-            // URL入力欄
-            TextField(              
-              controller: _controller,
-              decoration: InputDecoration(
-                labelText: 'YouTubeのURLを貼り付けてください',
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.play_arrow),
-                  onPressed: () {
-                    setState(() {
-                      _videoFuture = extractVideoFromUrl(_controller.text);
-                    });
-                  }
-                ),
-              ),
-            ), 
             const SizedBox(height: 12.0),
             SizedBox(
               child: FutureBuilder<Video>(
@@ -97,7 +81,7 @@ class _RecipeScreen extends State<RecipeScreen> {
                   }
 
                   final video = snapshot.data!;
-                  return RecipeTile(video: video);
+                  return Text(video.description);
                 },
               ),
             ),
