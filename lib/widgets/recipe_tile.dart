@@ -5,11 +5,13 @@ import '../models/video_model.dart';
 class RecipeTile extends StatelessWidget {
   final Video video;
   final VoidCallback onTap;
+  final VoidCallback onDelete;
 
   const RecipeTile({
     super.key,
     required this.video,
     required this.onTap,
+    required this.onDelete,
   });
 
   @override
@@ -37,14 +39,15 @@ class RecipeTile extends StatelessWidget {
                 ),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 3,
-                ),
+              ),
+            ),
+            IconButton(
+              icon: Icon(Icons.delete_sweep),
+              onPressed: onDelete,
             ),
           ]         
         ),
-        // 概要欄
-        // Text(RecipeParts.extractRecipe(video.description).steps),
-        onTap: onTap,
-        
+        onTap: onTap,        
       ),
     );
   }

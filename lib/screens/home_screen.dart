@@ -13,34 +13,39 @@ class HomeScreen extends ConsumerWidget {
     final videoLists = ref.watch(videoProvider);
     final notifier = ref.read(videoProvider.notifier);
 
+    ListView view = ListView.builder(
+      itemCount: videoLists.length,
+      itemBuilder: (context, index) {
+        if(videoLists.isEmpty){
+          return Text('右下のボタンから追加して');
+        }
+        else {
+          final Video video = videoLists[index];
+          return RecipeTile(
+            video: video,
+            onTap: () {
+              Navigator.push(
+                context, 
+                MaterialPageRoute(
+                  builder: (_) => RecipeScreen(video: video),
+                ),
+              );
+            },
+            onDelete: () {
+              notifier.deleteId(videoLists[index].id);           
+            },
+          );
+        }
+      },
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text('CopyRecipe'),
         centerTitle: true,
         backgroundColor: Colors.amber,
       ),
-      body: ListView.builder(
-        itemCount: videoLists.length,
-        itemBuilder: (context, index) {
-          if(videoLists.isEmpty){
-            return Text('右下のボタンから追加して');
-          }
-          else {
-            final Video video = videoLists[index];
-            return RecipeTile(
-              video: video,
-              onTap: () {
-                Navigator.push(
-                  context, 
-                  MaterialPageRoute(
-                    builder: (_) => RecipeScreen(video: video),
-                  ),
-                );
-              },
-            );
-          }
-        },
-      ),
+      body: view,
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.red,
         foregroundColor: Colors.white,
@@ -83,9 +88,13 @@ class HomeScreen extends ConsumerWidget {
                   setState(() {
                     url = titleController.text;
                   });
-                  ref.read(videoProvider.notifier)
-                      .extractVideoFromUrl(url!);
-                  Navigator.pop(context);
+                  try {
+                    ref.read(videoProvider.notifier).extractVideoFromUrl(url!);
+                  } catch(e) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+                  } finally {
+                    Navigator.pop(context);
+                  }
                 },
                 child: const Text('追加'),
               ),

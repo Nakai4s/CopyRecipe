@@ -1,9 +1,8 @@
 import 'dart:core';
 
 class TextExtractUtils {
-  TextExtractUtils._instantiate();
-  static final TextExtractUtils instance = TextExtractUtils._instantiate();
-
+  
+  // 抽出したレシピの文字列を返却する
   static String extractRecipe(String description) {
     // 正規化
     final lines = description.replaceAll('\r\n', '\n').split('\n');
@@ -19,7 +18,7 @@ class TextExtractUtils {
 
     // 関係ない動画の概要欄も拾うから一旦辞める
     if (start == -1) {
-      return '概要欄からレシピを抽出できませんでした。';
+      return '概要欄からレシピを抽出できませんでした';
     }
 
     // from start, gather until a footer-like section (SNS / Links / 提供 / 協賛) or long URL block
