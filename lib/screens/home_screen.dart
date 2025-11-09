@@ -13,37 +13,49 @@ class HomeScreen extends ConsumerWidget {
     final videoLists = ref.watch(videoProvider);
     final notifier = ref.read(videoProvider.notifier);
 
+    ListView view = ListView.builder(
+      itemCount: videoLists.length,
+      itemBuilder: (context, index) {
+        if(videoLists.isEmpty){
+          return Text('右下のボタンから追加して');
+        }
+        else {
+          final Video video = videoLists[index];
+          return RecipeTile(
+            video: video,
+            onTap: () {
+              Navigator.push(
+                context, 
+                MaterialPageRoute(
+                  builder: (_) => RecipeScreen(video: video),
+                ),
+              );
+            },
+            onDelete: () {
+              notifier.deleteId(videoLists[index].id);           
+            },
+          );
+        }
+      },
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text('CopyRecipe'),
         centerTitle: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(15),
+          ),
+        ),
+
         backgroundColor: Colors.amber,
       ),
-      body: ListView.builder(
-        itemCount: videoLists.length,
-        itemBuilder: (context, index) {
-          if(videoLists.isEmpty){
-            return Text('右下のボタンから追加して');
-          }
-          else {
-            final Video video = videoLists[index];
-            return RecipeTile(
-              video: video,
-              onTap: () {
-                Navigator.push(
-                  context, 
-                  MaterialPageRoute(
-                    builder: (_) => RecipeScreen(video: video),
-                  ),
-                );
-              },
-            );
-          }
-        },
-      ),
+      body: view,
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.red,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.amber,
+        foregroundColor: Colors.black,
+        shape: CircleBorder(),
         onPressed: ()  {
           _showAddRecipeDialog(context, ref);
         },
@@ -80,12 +92,17 @@ class HomeScreen extends ConsumerWidget {
               ),
               ElevatedButton(
                 onPressed: () {
-                  setState(() {
-                    url = titleController.text;
-                  });
-                  ref.read(videoProvider.notifier)
-                      .extractVideoFromUrl(url!);
-                  Navigator.pop(context);
+                  // setState(() {
+                  //   url = titleController.text;
+                  // });
+                  url = titleController.text;
+                  try {
+                    ref.read(videoProvider.notifier).extractVideoFromUrl(url!);
+                    Navigator.pop(context);
+                  } catch(e) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+                    Navigator.pop(context);
+                  }
                 },
                 child: const Text('追加'),
               ),

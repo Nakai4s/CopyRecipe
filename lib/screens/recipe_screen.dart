@@ -1,89 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:copy_recipe/models/video_model.dart';
-import 'package:copy_recipe/services/api_service.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:copy_recipe/utilities/text_extract_utils.dart';
 
-class RecipeScreen extends StatefulWidget {
+class RecipeScreen extends ConsumerWidget {
   final Video video;
   
   const RecipeScreen({super.key, required this.video});
-  @override
-  _RecipeScreen createState() => _RecipeScreen();
-}
-
-class _RecipeScreen extends State<RecipeScreen> {
-
-  // YouTubeのURLを入力するためのコントローラー
-  final _controller = TextEditingController();
-  Future<String>? _descriptionFuture;
-
-  Future<Video>? _videoFuture;
-
-  // 動画用コントローラー
-  YoutubePlayerController? _playerController;
-
-  /// URLから動画IDを抽出する
-  String extractVideoId(String url) {
-    final regex = RegExp(r'(?:v=|\/)([0-9A-Za-z_-]{11}).*');
-    final match = regex.firstMatch(url);
-    return match != null ? match.group(1)! : '';
-  }
-
-  /// URLから動画を抽出する
-  Future<Video> extractVideoFromUrl(String url) async {
-    final videoId = extractVideoId(url);
-    return await APIService.instance.fetchVideoFromId(videoId);
-  }
-
-  /// 動画を読み込む
-  void _loadVideo() async {
-    final url = _controller.text.trim();
-    final videoId = extractVideoId(url);
-    setState(() {
-      _playerController = YoutubePlayerController(
-        initialVideoId: videoId,
-        flags: const YoutubePlayerFlags(
-          autoPlay: true,
-          mute: false,
-        ),
-      );
-    });
-  }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      backgroundColor: const Color(0xFFEBE5C2),
       appBar: AppBar(
-        title: Text('CopyRecipe',
-          style: TextStyle(
-            color: const Color(0xFFF8F3D9),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(15),
           ),
         ),
-        centerTitle: true,
-        backgroundColor: const Color(0xFF504B38),
+        backgroundColor: Colors.amber,
       ),
       body: Container(        
         padding: const EdgeInsets.all(25.0),
         child: Column(          
           children: [
-            const SizedBox(height: 12.0),
-            SizedBox(
-              child: FutureBuilder<Video>(
-                future: _videoFuture, 
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Text('エラー: ${snapshot.error}');
-                  } else if (!snapshot.hasData || snapshot.data == null) {
-                    return const Text('動画が見つかりませんでした');
-                  }
-
-                  final video = snapshot.data!;
-                  return Text(video.description);
-                },
-              ),
+            Text(video.title, style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),),
+            const SizedBox(height: 20.0),
+            Text(
+              TextExtractUtils.extractRecipe(video.description),
             ),
           ],
         )

@@ -5,25 +5,29 @@ import '../models/video_model.dart';
 class RecipeTile extends StatelessWidget {
   final Video video;
   final VoidCallback onTap;
+  final VoidCallback onDelete;
 
   const RecipeTile({
     super.key,
     required this.video,
     required this.onTap,
+    required this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.all(12.0),
-      color: Colors.red,
+      margin: EdgeInsets.all(5.0),
+      color: Color(0xFFFFE8CD),
       child: ListTile(
-        title: Text(video.channelTitle, textAlign: TextAlign.left),
+        title: Text(video.channelTitle, textAlign: TextAlign.left, overflow: TextOverflow.ellipsis,),
         subtitle: Row(
           children: [
             // サムネイル画像
             Image(
-              width: 150.0,
+              width: 150,
+              height: 84,
+              fit: BoxFit.cover,
               image: NetworkImage(video.thumbnailUrl),
             ),
             const SizedBox(width: 5.0),
@@ -37,14 +41,15 @@ class RecipeTile extends StatelessWidget {
                 ),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 3,
-                ),
+              ),
+            ),
+            IconButton(
+              icon: Icon(Icons.delete_sweep),
+              onPressed: onDelete,
             ),
           ]         
         ),
-        // 概要欄
-        // Text(RecipeParts.extractRecipe(video.description).steps),
-        onTap: onTap,
-        
+        onTap: onTap,        
       ),
     );
   }
