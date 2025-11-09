@@ -75,7 +75,7 @@ class VideoNotifier extends Notifier<List<Video>> {
     // 概要欄からレシピを抽出できるか確認する
     for (final video in videos) {
       // 既に存在する場合はスキップ
-      if (TextExtractUtils.extractRecipe(video.description) == null) {
+      if (TextExtractUtils.extractRecipe(video.description) == '') {
         debugPrint('概要欄からレシピを抽出できませんでした: ${video.title}');
         continue;
       }
@@ -85,6 +85,7 @@ class VideoNotifier extends Notifier<List<Video>> {
     state = _box.values.toList();
   }
 
+  /// IDで動画を削除
   Future<void> deleteId(String id) async {
     await _box.delete(id);
     state = _box.values.toList();

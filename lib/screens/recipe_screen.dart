@@ -12,8 +12,11 @@ class RecipeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('CopyRecipe'),
-        centerTitle: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(15),
+          ),
+        ),
         backgroundColor: Colors.amber,
       ),
       body: Container(        
@@ -23,7 +26,7 @@ class RecipeScreen extends ConsumerWidget {
             Text(video.title, style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),),
             const SizedBox(height: 20.0),
             Text(
-              TextExtractUtils.extractRecipe(video.description)!,
+              TextExtractUtils.extractRecipe(video.description),
             ),
           ],
         )

@@ -43,12 +43,19 @@ class HomeScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text('CopyRecipe'),
         centerTitle: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(15),
+          ),
+        ),
+
         backgroundColor: Colors.amber,
       ),
       body: view,
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.red,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.amber,
+        foregroundColor: Colors.black,
+        shape: CircleBorder(),
         onPressed: ()  {
           _showAddRecipeDialog(context, ref);
         },
@@ -84,10 +91,11 @@ class HomeScreen extends ConsumerWidget {
                 child: const Text('キャンセル'),
               ),
               ElevatedButton(
-                onPressed: () async {
-                  setState(() {
-                    url = titleController.text;
-                  });
+                onPressed: () {
+                  // setState(() {
+                  //   url = titleController.text;
+                  // });
+                  url = titleController.text;
                   try {
                     ref.read(videoProvider.notifier).extractVideoFromUrl(url!);
                     Navigator.pop(context);
