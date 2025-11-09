@@ -1,5 +1,6 @@
 import 'package:copy_recipe/services/api_service.dart';
 import 'package:copy_recipe/utilities/text_extract_utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import '../models/video_model.dart';
@@ -45,30 +46,43 @@ class VideoNotifier extends Notifier<List<Video>> {
 
   /// URLから動画を抽出する
   Future<void> extractVideoFromUrl(String url) async {
+    // URLが不正であれば例外をスロー
+    if(!APIService.instance.isValidYoutubeUrl(url)){
+      debugPrint('不正なURLです');
+      throw Exception('不正なURLです');
+    }
+
+    // プレイリストIDがあればプレイリストとして処理
     final videoId = extractId(url, videoRegex);
-
-    if(videoId == null) {
-      throw Exception('動画を取得できませんでした');
-    }
-
-    Video v = await APIService.instance.fetchVideoFromId(videoId);
-    String description = TextExtractUtils.extractRecipe(v.description);
-    if(description == '') {
-      throw Exception('概要欄からレシピを抽出できませんでした');
-    }
-    await _box.put(v.id, v);
-    state = _box.values.toList();   
-  }
-
-  /// URLから動画を抽出する
-  Future<List<Video>> extractVideosFromUrl(String url) async {    
     final playlistId = extractId(url, listRegex);
-    List<Video> videos = await APIService.instance.fetchVideosFromPlaylistId(playlistId!);
-    for(var v in videos) {
-      await _box.put(v.id, v);
+
+    List<Video> videos = [];
+
+    // 動画IDのみ取得できた場合
+    if(videoId != null && playlistId == null) {
+      videos.add(await APIService.instance.fetchVideoFromId(videoId));
     }
+    // プレイリストIDのみ取得できた場合
+    else if(videoId == null && playlistId != null) {
+      videos = await APIService.instance.fetchVideosFromPlaylistId(playlistId);    
+    }
+    // どちらも取得できなかった場合
+    else {
+      debugPrint('動画またはプレイリストを取得できなかった');
+      throw Exception('動画またはプレイリストを取得できませんでした');
+    }
+
+    // 概要欄からレシピを抽出できるか確認する
+    for (final video in videos) {
+      // 既に存在する場合はスキップ
+      if (TextExtractUtils.extractRecipe(video.description) == null) {
+        debugPrint('概要欄からレシピを抽出できませんでした: ${video.title}');
+        continue;
+      }
+      await _box.put(video.id, video);
+    }
+
     state = _box.values.toList();
-    return videos;
   }
 
   Future<void> deleteId(String id) async {

@@ -3,7 +3,7 @@ import 'dart:core';
 class TextExtractUtils {
   
   // 抽出したレシピの文字列を返却する
-  static String extractRecipe(String description) {
+  static String? extractRecipe(String description) {
     // 正規化
     final lines = description.replaceAll('\r\n', '\n').split('\n');
 
@@ -18,7 +18,7 @@ class TextExtractUtils {
 
     // 関係ない動画の概要欄も拾うから一旦辞める
     if (start == -1) {
-      return '概要欄からレシピを抽出できませんでした';
+      return null;
     }
 
     // from start, gather until a footer-like section (SNS / Links / 提供 / 協賛) or long URL block

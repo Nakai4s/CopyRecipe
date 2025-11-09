@@ -20,8 +20,10 @@ class RecipeScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(25.0),
         child: Column(          
           children: [
+            Text(video.title, style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),),
+            const SizedBox(height: 20.0),
             Text(
-              TextExtractUtils.extractRecipe(video.description),          
+              TextExtractUtils.extractRecipe(video.description)!,
             ),
           ],
         )

@@ -84,15 +84,15 @@ class HomeScreen extends ConsumerWidget {
                 child: const Text('キャンセル'),
               ),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   setState(() {
                     url = titleController.text;
                   });
                   try {
                     ref.read(videoProvider.notifier).extractVideoFromUrl(url!);
+                    Navigator.pop(context);
                   } catch(e) {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
-                  } finally {
                     Navigator.pop(context);
                   }
                 },

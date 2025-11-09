@@ -20,12 +20,14 @@ class RecipeTile extends StatelessWidget {
       margin: EdgeInsets.all(5.0),
       color: Color(0xFFFFE8CD),
       child: ListTile(
-        title: Text(video.channelTitle, textAlign: TextAlign.left),
+        title: Text(video.channelTitle, textAlign: TextAlign.left, overflow: TextOverflow.ellipsis,),
         subtitle: Row(
           children: [
             // サムネイル画像
             Image(
-              width: 120.0,
+              width: 150,
+              height: 84,
+              fit: BoxFit.cover,
               image: NetworkImage(video.thumbnailUrl),
             ),
             const SizedBox(width: 5.0),

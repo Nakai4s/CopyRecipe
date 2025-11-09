@@ -76,7 +76,7 @@ class APIService {
   Future<List<Video>> fetchVideosFromPlaylistId(String playlistId) async {
     final parameters = {
       'part': 'snippet',
-      'maxResults': 20,
+      'maxResults': '20',
       'playlistId': playlistId,
       'key': API_KEY,
     };
@@ -98,6 +98,6 @@ class APIService {
       return items.map((item) => Video.fromMap(item)).toList();
     } else {
       throw Exception('動画情報の取得に失敗しました');
-    }    
+    }
   }
 }
