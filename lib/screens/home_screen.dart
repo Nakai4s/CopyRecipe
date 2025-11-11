@@ -13,29 +13,31 @@ class HomeScreen extends ConsumerWidget {
     final videoLists = ref.watch(videoProvider);
     final notifier = ref.read(videoProvider.notifier);
 
+    final Container emptyWidget = Container(
+      alignment: Alignment.center,
+      child: Text(
+        'Youtubeの料理動画または再生リストを追加してください'
+      ),
+    );
+
     ListView view = ListView.builder(
       itemCount: videoLists.length,
       itemBuilder: (context, index) {
-        if(videoLists.isEmpty){
-          return Text('右下のボタンから追加して');
-        }
-        else {
-          final Video video = videoLists[index];
-          return RecipeTile(
-            video: video,
-            onTap: () {
-              Navigator.push(
-                context, 
-                MaterialPageRoute(
-                  builder: (_) => RecipeScreen(video: video),
-                ),
-              );
-            },
-            onDelete: () {
-              notifier.deleteId(videoLists[index].id);           
-            },
-          );
-        }
+        final Video video = videoLists[index];
+        return RecipeTile(
+          video: video,
+          onTap: () {
+            Navigator.push(
+              context, 
+              MaterialPageRoute(
+                builder: (_) => RecipeScreen(video: video),
+              ),
+            );
+          },
+          onDelete: () {
+            notifier.deleteId(videoLists[index].id);           
+          },
+        );
       },
     );
 
@@ -51,7 +53,7 @@ class HomeScreen extends ConsumerWidget {
 
         backgroundColor: Colors.amber,
       ),
-      body: view,
+      body: videoLists.isNotEmpty ? view : emptyWidget,
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.amber,
         foregroundColor: Colors.black,
@@ -59,7 +61,7 @@ class HomeScreen extends ConsumerWidget {
         onPressed: ()  {
           _showAddRecipeDialog(context, ref);
         },
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add_link),
       ),
     );
   }
