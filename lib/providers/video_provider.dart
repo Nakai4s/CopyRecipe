@@ -87,7 +87,9 @@ class VideoNotifier extends Notifier<List<Video>> {
 
   /// IDで動画を削除
   Future<void> deleteId(String id) async {
+    // 1. 即座に state を更新 → UI が Dismissible を削除
+    state = state.where((video) => video.id != id).toList();
+    // 2. 非同期処理（Hive など）を後で実行
     await _box.delete(id);
-    state = _box.values.toList();
   }
 }

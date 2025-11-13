@@ -14,21 +14,23 @@ class RecipeScreen extends ConsumerWidget {
       appBar: AppBar(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(15),
+            bottom: Radius.circular(5),
           ),
         ),
         backgroundColor: Colors.amber,
       ),
       body: Container(        
         padding: const EdgeInsets.all(25.0),
-        child: Column(          
-          children: [
-            Text(video.title, style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),),
-            const SizedBox(height: 20.0),
-            Text(
-              TextExtractUtils.extractRecipe(video.description),
-            ),
-          ],
+        child: SingleChildScrollView(
+          child: Column(          
+            children: [
+              Text(video.title, style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),),
+              const SizedBox(height: 20.0),
+              Text(
+                TextExtractUtils.extractRecipe(video.description),
+              ),
+            ],
+          )
         )
       ),
     );

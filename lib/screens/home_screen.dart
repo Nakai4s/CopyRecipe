@@ -13,6 +13,7 @@ class HomeScreen extends ConsumerWidget {
     final videoLists = ref.watch(videoProvider);
     final notifier = ref.read(videoProvider.notifier);
 
+    // 動画がない場合に表示するウィジェット
     final Container emptyWidget = Container(
       alignment: Alignment.center,
       child: Text(
@@ -20,6 +21,7 @@ class HomeScreen extends ConsumerWidget {
       ),
     );
 
+    // 動画リストのウィジェット
     ListView view = ListView.builder(
       itemCount: videoLists.length,
       itemBuilder: (context, index) {
@@ -34,9 +36,6 @@ class HomeScreen extends ConsumerWidget {
               ),
             );
           },
-          onDelete: () {
-            notifier.deleteId(videoLists[index].id);           
-          },
         );
       },
     );
@@ -47,10 +46,9 @@ class HomeScreen extends ConsumerWidget {
         centerTitle: true,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(15),
+            bottom: Radius.circular(5),
           ),
         ),
-
         backgroundColor: Colors.amber,
       ),
       body: videoLists.isNotEmpty ? view : emptyWidget,
