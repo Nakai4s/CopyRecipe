@@ -42,13 +42,6 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('CopyRecipe'),
-        centerTitle: true,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(5),
-          ),
-        ),
         backgroundColor: Colors.amber,
       ),
       body: videoLists.isNotEmpty ? view : emptyWidget,
@@ -92,17 +85,11 @@ class HomeScreen extends ConsumerWidget {
               ),
               ElevatedButton(
                 onPressed: () {
-                  // setState(() {
-                  //   url = titleController.text;
-                  // });
-                  url = titleController.text;
-                  try {
-                    ref.read(videoProvider.notifier).extractVideoFromUrl(url!);
-                    Navigator.pop(context);
-                  } catch(e) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
-                    Navigator.pop(context);
-                  }
+                  setState(() {
+                    url = titleController.text;
+                  });
+                  ref.read(videoProvider.notifier).extractVideoFromUrl(url!, context);
+                  Navigator.pop(context);
                 },
                 child: const Text('追加'),
               ),

@@ -12,11 +12,6 @@ class RecipeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(5),
-          ),
-        ),
         backgroundColor: Colors.amber,
       ),
       body: Container(        
