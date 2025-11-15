@@ -20,6 +20,12 @@ class RecipeTile extends ConsumerWidget {
 
     return Dismissible(
       key: Key(video.id),
+      background: Container(
+        color: Colors.red,
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20.0),
+        child: const Icon(Icons.delete, color: Colors.white),
+      ),
       onDismissed: (direction) {
         notifier.deleteId(video.id);
         ScaffoldMessenger.of(context).showSnackBar(

@@ -11,7 +11,6 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final videoLists = ref.watch(videoProvider);
-    final notifier = ref.read(videoProvider.notifier);
 
     // 動画がない場合に表示するウィジェット
     final Container emptyWidget = Container(
