@@ -1,7 +1,7 @@
 import 'dart:core';
 
+/// テキスト抽出クラス
 class TextExtractUtils {
-  
   // 抽出したレシピの文字列を返却する
   static String extractRecipe(String description) {
     // 正規化

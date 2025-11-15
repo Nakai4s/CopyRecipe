@@ -1,6 +1,6 @@
 import 'package:copy_recipe/services/api_service.dart';
 import 'package:copy_recipe/utilities/text_extract_utils.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import '../models/video_model.dart';
@@ -26,13 +26,13 @@ class VideoNotifier extends Notifier<List<Video>> {
   // }
 
   // 保存：全件保存（上書き）
-  Future<void> saveToStorage() async {
-    await _box.clear();
-    state = _box.values.toList();
-    // for (final v in state) {
-    //   await _box.put(v.id, v);
-    // }
-  }
+  // Future<void> saveToStorage() async {
+  //   await _box.clear();
+  //   state = _box.values.toList();
+  //   // for (final v in state) {
+  //   //   await _box.put(v.id, v);
+  //   // }
+  // }
 
   /// URLからプレイリストIDを抽出
   String? extractId(String url, RegExp regex) {
@@ -45,49 +45,75 @@ class VideoNotifier extends Notifier<List<Video>> {
   }
 
   /// URLから動画を抽出する
-  Future<void> extractVideoFromUrl(String url) async {
-    // URLが不正であれば例外をスロー
-    if(!APIService.instance.isValidYoutubeUrl(url)){
-      debugPrint('不正なURLです');
-      throw Exception('不正なURLです');
-    }
-
-    // プレイリストIDがあればプレイリストとして処理
-    final videoId = extractId(url, videoRegex);
-    final playlistId = extractId(url, listRegex);
-
-    List<Video> videos = [];
-
-    // 動画IDのみ取得できた場合
-    if(videoId != null && playlistId == null) {
-      videos.add(await APIService.instance.fetchVideoFromId(videoId));
-    }
-    // プレイリストIDのみ取得できた場合
-    else if(videoId == null && playlistId != null) {
-      videos = await APIService.instance.fetchVideosFromPlaylistId(playlistId);    
-    }
-    // どちらも取得できなかった場合
-    else {
-      debugPrint('動画またはプレイリストを取得できなかった');
-      throw Exception('動画またはプレイリストを取得できませんでした');
-    }
-
-    // 概要欄からレシピを抽出できるか確認する
-    for (final video in videos) {
-      // 既に存在する場合はスキップ
-      if (TextExtractUtils.extractRecipe(video.description) == '') {
-        debugPrint('概要欄からレシピを抽出できませんでした: ${video.title}');
-        continue;
+  Future<void> extractVideoFromUrl(String url, BuildContext context) async {
+    try {
+      // YoutubeのURLでなければ処理を抜ける
+      if(!APIService.instance.isValidYoutubeUrl(url)){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('不正なURLです')),
+        );
+        return;
       }
-      await _box.put(video.id, video);
-    }
 
-    state = _box.values.toList();
+      // プレイリストIDがあればプレイリストとして処理
+      final videoId = extractId(url, videoRegex);
+      final playlistId = extractId(url, listRegex);
+
+      // 動画を一時的に格納するリスト
+      List<Video> videos = [];
+      // レシピを抽出できた動画を一時的に格納するリスト
+      List<Video> recipeVideos = [];
+
+      // 動画IDのみ取得できた場合
+      if(videoId != null && playlistId == null) {
+        videos.add(await APIService.instance.fetchVideoFromId(videoId));
+      }
+      // プレイリストIDのみ取得できた場合
+      else if(videoId == null && playlistId != null) {
+        videos = await APIService.instance.fetchVideosFromPlaylistId(playlistId);
+      }
+      // どちらも取得できなかった場合
+      else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('動画を取得できませんでした')),
+        );
+        return;
+      }
+
+      // レシピを抽出できた動画リストを取得
+      recipeVideos = videos.where((v) => TextExtractUtils.extractRecipe(v.description) != '').toList();
+      if(recipeVideos.isEmpty) {
+        if(context.mounted){
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('レシピを抽出できる動画がありませんでした')),
+          );
+        }
+        return;
+      }
+      else {
+        // Hiveに保存
+        for (final video in recipeVideos) {
+          await _box.put(video.id, video);
+        }
+        // stateを更新
+        state = _box.values.toList();
+
+        if(context.mounted){
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${videos.length}件中、${recipeVideos.length}件のレシピを追加しました')),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('エラーが発生しました: ${e.toString()}');
+    }
   }
 
   /// IDで動画を削除
   Future<void> deleteId(String id) async {
+    // 1. 即座に state を更新 → UI が Dismissible を削除
+    state = state.where((video) => video.id != id).toList();
+    // 2. 非同期処理（Hive など）を後で実行
     await _box.delete(id);
-    state = _box.values.toList();
   }
 }

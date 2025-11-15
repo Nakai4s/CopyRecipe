@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:copy_recipe/dart_define.gen.dart';
 import 'package:copy_recipe/models/video_model.dart';
 import 'package:http/http.dart' as http;
-import 'package:copy_recipe/utilities/keys.dart';
 
 /// YoutubeAPI機能クラス
 class APIService {
@@ -48,14 +48,10 @@ class APIService {
     final parameters = {
       'part': 'snippet',
       'id': id,
-      'key': API_KEY,
+      'key': DartDefine.apiKey,
     };
 
-    final url = Uri.https(
-      _baseUrl, 
-      '/youtube/v3/videos', 
-      parameters
-    );
+    final url = Uri.https(_baseUrl, '/youtube/v3/videos', parameters);
 
     Map<String, String> headers = {
       HttpHeaders.contentTypeHeader: 'application/json',
@@ -76,16 +72,12 @@ class APIService {
   Future<List<Video>> fetchVideosFromPlaylistId(String playlistId) async {
     final parameters = {
       'part': 'snippet',
-      'maxResults': '20',
+      'maxResults': '25',
       'playlistId': playlistId,
-      'key': API_KEY,
+      'key': DartDefine.apiKey,
     };
 
-    final url = Uri.https(
-      _baseUrl, 
-      '/youtube/v3/playlistItems', 
-      parameters
-    );
+    final url = Uri.https(_baseUrl, '/youtube/v3/playlistItems', parameters);
 
     Map<String, String> headers = {
       HttpHeaders.contentTypeHeader: 'application/json',

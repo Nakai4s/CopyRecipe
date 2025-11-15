@@ -11,47 +11,39 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final videoLists = ref.watch(videoProvider);
-    final notifier = ref.read(videoProvider.notifier);
 
+    // 動画がない場合に表示するウィジェット
+    final Container emptyWidget = Container(
+      alignment: Alignment.center,
+      child: Text(
+        'Youtubeの料理動画または再生リストを追加してください'
+      ),
+    );
+
+    // 動画リストのウィジェット
     ListView view = ListView.builder(
       itemCount: videoLists.length,
       itemBuilder: (context, index) {
-        if(videoLists.isEmpty){
-          return Text('右下のボタンから追加して');
-        }
-        else {
-          final Video video = videoLists[index];
-          return RecipeTile(
-            video: video,
-            onTap: () {
-              Navigator.push(
-                context, 
-                MaterialPageRoute(
-                  builder: (_) => RecipeScreen(video: video),
-                ),
-              );
-            },
-            onDelete: () {
-              notifier.deleteId(videoLists[index].id);           
-            },
-          );
-        }
+        final Video video = videoLists[index];
+        return RecipeTile(
+          video: video,
+          onTap: () {
+            Navigator.push(
+              context, 
+              MaterialPageRoute(
+                builder: (_) => RecipeScreen(video: video),
+              ),
+            );
+          },
+        );
       },
     );
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('CopyRecipe'),
-        centerTitle: true,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(15),
-          ),
-        ),
-
         backgroundColor: Colors.amber,
       ),
-      body: view,
+      body: videoLists.isNotEmpty ? view : emptyWidget,
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.amber,
         foregroundColor: Colors.black,
@@ -59,7 +51,7 @@ class HomeScreen extends ConsumerWidget {
         onPressed: ()  {
           _showAddRecipeDialog(context, ref);
         },
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add_link),
       ),
     );
   }
@@ -92,17 +84,11 @@ class HomeScreen extends ConsumerWidget {
               ),
               ElevatedButton(
                 onPressed: () {
-                  // setState(() {
-                  //   url = titleController.text;
-                  // });
-                  url = titleController.text;
-                  try {
-                    ref.read(videoProvider.notifier).extractVideoFromUrl(url!);
-                    Navigator.pop(context);
-                  } catch(e) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
-                    Navigator.pop(context);
-                  }
+                  setState(() {
+                    url = titleController.text;
+                  });
+                  ref.read(videoProvider.notifier).extractVideoFromUrl(url!, context);
+                  Navigator.pop(context);
                 },
                 child: const Text('追加'),
               ),
