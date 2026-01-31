@@ -59,42 +59,46 @@ class HomeScreen extends ConsumerWidget {
   // URLを入力するダイアログを表示
   Future<void> _showAddRecipeDialog(BuildContext context, WidgetRef ref) async {
     final titleController = TextEditingController();
-    String? url;
 
     await showDialog(
       context: context,
       builder: (context) {
-        return StatefulBuilder(
-        builder: (context, setState) {
-          return AlertDialog(
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: titleController,
-                  decoration: const InputDecoration(labelText: 'URL'),
-                ),
-                const SizedBox(height: 10),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('キャンセル'),
+        return AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleController,
+                decoration: const InputDecoration(hintText: 'Youtubeの動画または再生リストのURLを入力'),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    url = titleController.text;
-                  });
-                  ref.read(videoProvider.notifier).extractVideoFromUrl(url!, context);
-                  Navigator.pop(context);
-                },
-                child: const Text('追加'),
-              ),
+              const SizedBox(height: 10),
             ],
-          );
-        });
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('キャンセル'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final url = titleController.text;
+                try {
+                  await ref.read(videoProvider.notifier).extractVideoFromUrl(url);
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('エラー: ${e.toString()}')),
+                    );
+                  }
+                }
+              },
+              child: const Text('追加'),
+            ),
+          ],
+        );
       },
     );
   }
