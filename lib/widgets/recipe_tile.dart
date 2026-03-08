@@ -17,7 +17,7 @@ class RecipeTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = ref.read(videoProvider.notifier);
-
+    
     return Dismissible(
       key: Key(video.id),
       background: Container(

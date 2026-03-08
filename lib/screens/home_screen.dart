@@ -1,105 +1,77 @@
 import 'package:copy_recipe/models/video_model.dart';
+import 'package:copy_recipe/screens/add_url_screen.dart';
 import 'package:copy_recipe/screens/recipe_screen.dart';
 import 'package:copy_recipe/widgets/recipe_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/video_provider.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  int _currentIndex = 0;
+
+  void _switchToRecipeList() {
+    setState(() => _currentIndex = 0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final videoLists = ref.watch(videoProvider);
 
-    // 動画がない場合に表示するウィジェット
-    final Container emptyWidget = Container(
-      alignment: Alignment.center,
-      child: Text(
-        'Youtubeの料理動画または再生リストを追加してください'
-      ),
-    );
-
-    // 動画リストのウィジェット
-    ListView view = ListView.builder(
-      itemCount: videoLists.length,
-      itemBuilder: (context, index) {
-        final Video video = videoLists[index];
-        return RecipeTile(
-          video: video,
-          onTap: () {
-            Navigator.push(
-              context, 
-              MaterialPageRoute(
-                builder: (_) => RecipeScreen(video: video),
-              ),
-            );
-          },
-        );
-      },
-    );
+    final recipeListBody = videoLists.isNotEmpty
+        ? ListView.builder(
+            itemCount: videoLists.length,
+            itemBuilder: (context, index) {
+              final Video video = videoLists[index];
+              return RecipeTile(
+                video: video,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => RecipeScreen(video: video),
+                    ),
+                  );
+                },
+              );
+            },
+          )
+        : Container(
+            alignment: Alignment.center,
+            child: const Text('Youtubeの料理動画または再生リストを追加してください'),
+          );
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.amber,
       ),
-      body: videoLists.isNotEmpty ? view : emptyWidget,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.amber,
-        foregroundColor: Colors.black,
-        shape: CircleBorder(),
-        onPressed: ()  {
-          _showAddRecipeDialog(context, ref);
-        },
-        child: const Icon(Icons.add_link),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: [
+          recipeListBody,
+          AddUrlScreen(onAdded: _switchToRecipeList),
+        ],
       ),
-    );
-  }
-
-  // URLを入力するダイアログを表示
-  Future<void> _showAddRecipeDialog(BuildContext context, WidgetRef ref) async {
-    final titleController = TextEditingController();
-
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: titleController,
-                decoration: const InputDecoration(hintText: 'Youtubeの動画または再生リストのURLを入力'),
-              ),
-              const SizedBox(height: 10),
-            ],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) => setState(() => _currentIndex = index),
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            label: 'レシピ一覧',
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('キャンセル'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                final url = titleController.text;
-                try {
-                  await ref.read(videoProvider.notifier).extractVideoFromUrl(url);
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                  }
-                } catch (e) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('エラー: ${e.toString()}')),
-                    );
-                  }
-                }
-              },
-              child: const Text('追加'),
-            ),
-          ],
-        );
-      },
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_link),
+            label: 'URL追加',
+          ),
+        ],
+      ),
     );
   }
 }
