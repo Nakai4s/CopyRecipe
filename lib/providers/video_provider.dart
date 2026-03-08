@@ -53,6 +53,21 @@ class VideoNotifier extends Notifier<List<Video>> {
     state = _box.values.toList();
   }
 
+  /// descriptionを更新
+  Future<void> updateDescription(String id, String description) async {
+    final existing = _box.get(id);
+    if (existing == null) return;
+    final updated = Video(
+      id: existing.id,
+      title: existing.title,
+      thumbnailUrl: existing.thumbnailUrl,
+      channelTitle: existing.channelTitle,
+      description: description,
+    );
+    await _box.put(id, updated);
+    state = _box.values.toList();
+  }
+
   /// IDで動画を削除
   Future<void> deleteId(String id) async {
     state = state.where((video) => video.id != id).toList();

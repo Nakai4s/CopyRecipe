@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nrefactor: clean up VideoNotifier and remove anti-patterns\n\n- Remove BuildContext dependency from provider \\(Riverpod anti-pattern\\)\n- Move error handling to UI layer with try/catch\n- Make RegExp static final to avoid per-instance allocation\n- Remove unused displayListInfo method and instance fields\n- Remove unnecessary StatefulBuilder from dialog\n- Fix unhandled case when both videoId and playlistId are present\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nrefactor: improve recipe extraction pattern matching\n\n- Add support for more recipe heading formats \\(■, 【, ◆, ●, ▼\\)\n- Check footer patterns only at line start to avoid breaking on inline URLs\n- Add consecutive empty line detection for section boundaries\n- Remove empty lines from output for cleaner result\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git commit:*)"
+    ]
+  }
+}
